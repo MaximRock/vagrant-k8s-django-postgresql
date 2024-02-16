@@ -1,0 +1,5 @@
+---
+# vars file for docker
+
+ver_docker_compose: "2.15.1"
+user_name: "vagrant"

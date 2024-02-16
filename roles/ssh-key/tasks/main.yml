@@ -1,0 +1,45 @@
+---
+# tasks file for ssh-key
+
+
+- name: Update and upgrade apt packages
+  ansible.builtin.apt:
+    # upgrade: yes
+    update_cache: true
+
+- name: Copy content ssh key
+  become_user: maxim
+  local_action: ansible.builtin.command cat "{{ path_to_file }}/{{ name_ssh_key_pub }}"
+  register: __file_content
+
+- name: Read ssh key
+  ansible.builtin.debug:
+    msg: "{{ __file_content.stdout_lines }}"
+
+- name: Copy ssh-key
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  loop:
+    - { src: '{{ local_path_ssh_key }}/{{ name_ssh_key_pub }}', dest: '{{ remove_path_ssh_key }}/{{ name_ssh_key_pub }}', mode: '0644' }
+    - { src: '{{ local_path_ssh_key }}/{{ name_ssh_key_privat }}', dest: '{{ remove_path_ssh_key }}/{{ name_ssh_key_privat }}', mode: '0600' }
+  delegate_to: srv  
+
+- name: Set authorized key taken from file
+  ansible.posix.authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', '{{ path_to_file }}/{{ name_ssh_key_pub }}') }}"
+
+
+- name: Update /etc/hosts
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    block: |
+      192.168.1.10  srv
+      192.168.1.21  master-1
+      192.168.1.22  master-2
+      192.168.1.31  worker-1

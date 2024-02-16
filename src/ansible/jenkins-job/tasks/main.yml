@@ -1,0 +1,43 @@
+---
+# tasks file for roles/jenkins-job
+
+- name: Install required system packages
+  ansible.builtin.apt:
+    pkg:
+      - python3-pip
+    state: latest
+    update_cache: true
+
+- name: Install python-jenkins
+  ansible.builtin.pip:
+    name:
+      - python-jenkins
+
+- name: Install plugin jenkins | plugin ansible 
+  community.general.jenkins_plugin:
+    name: ansible
+    url_username: admin 
+    url_password: admin 
+    url: "http://{{ ip_server_jenkins }}:8080"
+
+- name: Enable Jenkins
+  ansible.builtin.service:
+    name: jenkins
+    state: restarted
+    enabled: yes
+
+- name: Create a jenkins job using basic authentication
+  community.general.jenkins_job:
+    config: "{{ lookup('file', 'templates/docker-hub.xml') }}"
+    name: docker-hub
+    password: admin
+    user: admin
+    url: "http://{{ ip_server_jenkins }}:8080"
+
+- name: Create a jenkins build using basic authentication
+  community.general.jenkins_build:
+    name: docker-hub
+    state: present
+    user: admin
+    password: admin
+    url: "http://{{ ip_server_jenkins }}:8080"    

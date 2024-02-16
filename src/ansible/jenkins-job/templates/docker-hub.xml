@@ -1,0 +1,62 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@1308.v58d48a_763b_31">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2133.ve46a_6113dfc3"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2133.ve46a_6113dfc3">
+      <jobProperties/>
+      <triggers/>
+      <parameters/>
+      <options/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@3673.v5b_dd74276262">
+    <script>pipeline {
+    agent any
+    environment {
+        ANSIBLE_PRIVATE_KEY=credentials(&apos;private-key&apos;)
+    }
+    stages {
+        stage(&apos;ansible version&apos;) {
+            steps {
+                sh &quot;ansible --version&quot;
+            }
+        }
+        stage(&apos;Delete workspace before build starts&apos;) {
+            steps {
+                echo &apos;Deleting workspace&apos;
+                deleteDir()
+            }
+        }
+        stage(&apos;Checkout&apos;) {
+            steps {
+                git branch: &apos;master&apos;,
+                    url: &apos;https://github.com/MaximRock/devops-docker-hub.git&apos;
+                    
+                    sh &apos;pwd&apos;
+                    sh &apos;ls -la&apos;
+            }
+        }
+        stage(&apos;ansible-requirements&apos;){
+            steps {
+                dir(&apos;ansible&apos;){
+                    sh &apos;ansible-galaxy collection install -r requirements.yml&apos;
+                }
+            }
+        }
+        stage(&apos;ansible-playbook&apos;){
+            steps {
+                dir(&apos;ansible&apos;){
+                    sh &apos;ansible-playbook -i hosts --private-key=$ANSIBLE_PRIVATE_KEY play.yml&apos;
+                }
+            }
+        }
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

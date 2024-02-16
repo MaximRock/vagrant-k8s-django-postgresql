@@ -1,0 +1,9 @@
+---
+# vars file for kubespray
+
+path_kubespray: "~/kubespray"
+path_cluster_k8s: "~/kubespray/inventory"
+name_cluster: "mycluster"
+path_smple: "~/kubespray/inventory/sample"
+path_local_inventory: "/home/maxim/github/vagrant-k8s-django-postgresql/src"
+path_remove_inventory: "~/kubespray/inventory/mycluster"

@@ -1,0 +1,11 @@
+---
+# vars file for ssh-key
+
+type_key: "ed25519"
+size_key: "4096"
+path_to_file: "~/github/vagrant-k8s-django-postgresql/src/mykeys"
+name_ssh_key_pub: "myansible.key.pub"
+name_ssh_key_privat: "myansible.key"
+user_name: "root"
+local_path_ssh_key: "/home/maxim/github/vagrant-k8s-django-postgresql/src/mykeys"
+remove_path_ssh_key: "~/.ssh"

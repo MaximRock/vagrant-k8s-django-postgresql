@@ -1,0 +1,68 @@
+
+
+
+команда для запуска ansible
+ansible-playbook -i inventory/mycluster/hosts.yaml  --become --become-user=root --private-key=~/.ssh/myansible.key cluster.yml
+
+активация виртуальной среды
+source venv/bin/activate
+
+
+
+vagrant provision srv --provision-with ansible
+
+vagrant halt srv
+
+kubernetes
+
+установка metallb 
+
+kubectl edit configmap -n kube-system kube-proxy
+
+изменяем 
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: "ipvs"
+ipvs:
+  strictARP: true
+
+выполняем
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.3/config/manifests/metallb-native.yaml
+
+установка nginx
+
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress-nginx --create-namespace
+
+export KUBECONFIG=/path/to/admin.conf
+
+kubectl create ns appjango - создание namespase
+
+kubectl apply -f filename
+
+kubectl -n test port-forward appdjango-7bb4b8d758-sph7k 9000:8000
+
+kubectl -n test exec -it appdjango-6db799fb8d-dhm96 -- bash
+
+./manage.py createsuperuser
+
+Username (leave blank to use 'root'): admin
+Email address: admin@max.test 
+password: 123
+
+
+app-secret app-pods pg-pods app-deploy pg-deploy pg-sevice app-migration app-service
+
+настройка Jenkins
+
+Dashboard > Настроить Jenkins > Credentials > System > Global credentials (unrestricted)
+
+KIND > SSH Username with private key
+SCOPE > не трогаем
+ID > private-key
+Username > vagrant
+ENTER DIRECTORY > копируем текст private key
+жмем > create
+
+

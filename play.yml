@@ -1,0 +1,24 @@
+---
+
+# - name: Update system | SSH KEY | Docker 
+#   hosts: all
+#   become: true
+#   roles:
+#     - role: roles/ssh-key
+#       tags: ssh-key
+
+#     - role: roles/docker
+#       tags: docker  
+
+- name: Config Kubespray | Jenkins 
+  hosts: srv
+  become: true      
+  roles:
+    # - role: roles/kubespray
+    #   tags: kubespray
+
+    # - role: roles/jenkins  
+    #   tags: jenkins
+
+    # - role: roles/jenkins-config
+    #   tags: jenkins-config

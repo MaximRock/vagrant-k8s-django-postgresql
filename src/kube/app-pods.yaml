@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: appdjango
+spec:
+  containers:
+    - name: appdjango-pod
+      image: testmaxdev/django-postgresql-image:1.0.2
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 8000
+          name: http
+      env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: pg-credentials
+              key: user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pg-credentials
+              key: password
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: pg-credentials
+              key: db_name
+        - name: DATABASE_URL
+          value: postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@pg:5432/$(POSTGRES_DB)

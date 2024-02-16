@@ -1,0 +1,42 @@
+---
+# tasks file for roles/jenkins-config
+
+- name: Install required system packages
+  ansible.builtin.apt:
+    pkg:
+      - python3-pip
+    state: latest
+    update_cache: true
+
+- name: Install ansible
+  ansible.builtin.pip:
+    name:
+      - ansible 
+
+- name: Generate ssh-key
+  community.crypto.openssh_keypair:
+    path: "/home/vagrant/.ssh/jenkins-key"
+    owner: vagrant 
+    state: present
+    type: ed25519
+    size: 4096
+    force: true
+
+- name: Read file ssh-key
+  ansible.builtin.shell: cat /home/vagrant/.ssh/jenkins-key.pub
+  register: __file_content
+  delegate_to: srv
+
+- name: Read ssh key
+  ansible.builtin.debug:
+    msg: "{{ __file_content.stdout_lines }}"
+
+- name: Add ssh-key
+  ansible.builtin.lineinfile:
+    path: "/home/vagrant/.ssh/authorized_keys"
+    line: "{{ __file_content.stdout }}"   
+
+- name: Clone repo
+  ansible.builtin.git:
+    repo: "https://github.com/MaximRock/devops-docker-hub.git"
+    dest: "/home/vagrant/devops-docker-hub"

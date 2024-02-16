@@ -1,0 +1,52 @@
+---
+# tasks file for roles/jenkins
+
+- name: Allow connections on multiple ports
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "8080"
+    jump: ACCEPT
+
+- name: Install JRE and JDK
+  apt: 
+    name: "{{ item }}"
+    update_cache: yes
+    install_recommends: no
+  loop:
+    - "openjdk-11-jre"
+    - "openjdk-11-jdk"
+
+- name: One way to avoid apt_key once it is removed from your distro
+  block:
+    - name: Apt key
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+
+    - name: Apt source
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+
+- name: Install Jenkins
+  ansible.builtin.apt:
+    name: jenkins
+    update_cache: true      
+
+- name: jenkins password
+  ansible.builtin.shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+  register: __unlock_jenkins
+
+- name: Print unlock jenkins
+  ansible.builtin.debug:
+    msg: "{{ __unlock_jenkins.stdout_lines }}"
+
+- name: Add groupdocker user jenkins
+  ansible.builtin.shell: usermod -aG docker jenkins
+
+- name: Enable Jenkins
+  ansible.builtin.service:
+    name: jenkins
+    state: restarted
+    enabled: yes
